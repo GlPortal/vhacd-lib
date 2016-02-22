@@ -15,6 +15,28 @@ subject to the following restrictions:
 
 #include "btAlignedAllocator.h"
 
+///align a pointer to the provided alignment, upwards
+template <typename T>T* btAlignPointer(T* unalignedPtr, size_t alignment)
+{
+		
+	struct btConvertPointerSizeT
+	{
+		union 
+		{
+				T* ptr;
+				size_t integer;
+		};
+	};
+    btConvertPointerSizeT converter;
+    
+    
+	const size_t bit_mask = ~(alignment - 1);
+    converter.ptr = unalignedPtr;
+	converter.integer += alignment-1;
+	converter.integer &= bit_mask;
+	return converter.ptr;
+}
+
 int gNumAlignedAllocs = 0;
 int gNumAlignedFree = 0;
 int gTotalBytesAlignedAllocs = 0;//detect memory leaks
@@ -58,16 +80,18 @@ static inline void btAlignedFreeDefault(void *ptr)
 	free(ptr);
 }
 #else
+
+
+
+
+
 static inline void *btAlignedAllocDefault(size_t size, int alignment)
 {
   void *ret;
   char *real;
-  unsigned long offset;
-
   real = (char *)sAllocFunc(size + sizeof(void *) + (alignment-1));
   if (real) {
-    offset = (alignment - (unsigned long)(real + sizeof(void *))) & (alignment-1);
-    ret = (void *)((real + sizeof(void *)) + offset);
+	ret = btAlignPointer(real + sizeof(void *),alignment);
     *((void **)(ret)-1) = (void *)(real);
   } else {
     ret = (void *)(real);
@@ -110,7 +134,6 @@ void*   btAlignedAllocInternal  (size_t size, int alignment,int line,char* filen
 {
  void *ret;
  char *real;
- unsigned long offset;
 
  gTotalBytesAlignedAllocs += size;
  gNumAlignedAllocs++;
@@ -118,9 +141,7 @@ void*   btAlignedAllocInternal  (size_t size, int alignment,int line,char* filen
  
  real = (char *)sAllocFunc(size + 2*sizeof(void *) + (alignment-1));
  if (real) {
-   offset = (alignment - (unsigned long)(real + 2*sizeof(void *))) &
-(alignment-1);
-   ret = (void *)((real + 2*sizeof(void *)) + offset);
+   ret = (void*) btAlignPointer(real + 2*sizeof(void *), alignment);
    *((void **)(ret)-1) = (void *)(real);
        *((int*)(ret)-2) = size;
 
