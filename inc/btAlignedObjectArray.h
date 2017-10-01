@@ -39,6 +39,12 @@ subject to the following restrictions:
 #include <new> //for placement new
 #endif //BT_USE_PLACEMENT_NEW
 
+// The register keyword is deprecated in C++11 so don't use it.
+#if __cplusplus > 199711L
+#define BT_REGISTER
+#else
+#define BT_REGISTER register
+#endif
 
 ///The btAlignedObjectArray template class uses a subset of the stl::vector interface for its methods
 ///It is developed to replace stl::vector to avoid portability issues, including STL alignment issues to add SIMD/SSE data
@@ -197,11 +203,21 @@ protected:
 			m_data[m_size].~T();
 		}
 
+
 		///resize changes the number of elements in the array. If the new size is larger, the new elements will be constructed using the optional second argument.
 		///when the new number of elements is smaller, the destructor will be called, but memory will not be freed, to reduce performance overhead of run-time memory (de)allocations.
+		SIMD_FORCE_INLINE	void	resizeNoInitialize(int newsize)
+		{
+			if (newsize > size())
+			{
+				reserve(newsize);
+			}
+			m_size = newsize;
+		}
+	
 		SIMD_FORCE_INLINE	void	resize(int newsize, const T& fillData=T())
 		{
-			int curSize = size();
+			const BT_REGISTER int curSize = size();
 
 			if (newsize < curSize)
 			{
@@ -211,7 +227,7 @@ protected:
 				}
 			} else
 			{
-				if (newsize > size())
+				if (newsize > curSize)
 				{
 					reserve(newsize);
 				}
@@ -226,10 +242,9 @@ protected:
 
 			m_size = newsize;
 		}
-	
 		SIMD_FORCE_INLINE	T&  expandNonInitializing( )
 		{	
-			int sz = size();
+			const BT_REGISTER int sz = size();
 			if( sz == capacity() )
 			{
 				reserve( allocSize(size()) );
@@ -242,7 +257,7 @@ protected:
 
 		SIMD_FORCE_INLINE	T&  expand( const T& fillValue=T())
 		{	
-			int sz = size();
+			const BT_REGISTER int sz = size();
 			if( sz == capacity() )
 			{
 				reserve( allocSize(size()) );
@@ -258,7 +273,7 @@ protected:
 
 		SIMD_FORCE_INLINE	void push_back(const T& _Val)
 		{	
-			int sz = size();
+			const BT_REGISTER int sz = size();
 			if( sz == capacity() )
 			{
 				reserve( allocSize(size()) );
@@ -307,12 +322,13 @@ protected:
 		{
 			public:
 
-				bool operator() ( const T& a, const T& b )
+				bool operator() ( const T& a, const T& b ) const
 				{
 					return ( a < b );
 				}
 		};
 	
+
 		template <typename L>
 		void quickSortInternal(const L& CompareFunc,int lo, int hi)
 		{
@@ -460,15 +476,18 @@ protected:
 		return index;
 	}
 
+    void removeAtIndex(int index)
+    {
+        if (index<size())
+        {
+            swap( index,size()-1);
+            pop_back();
+        }
+    }
 	void	remove(const T& key)
 	{
-
 		int findIndex = findLinearSearch(key);
-		if (findIndex<size())
-		{
-			swap( findIndex,size()-1);
-			pop_back();
-		}
+        removeAtIndex(findIndex);
 	}
 
 	//PCK: whole function
