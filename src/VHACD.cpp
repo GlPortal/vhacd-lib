@@ -21,6 +21,7 @@
 #include <fstream>
 #include <iomanip>
 #include <limits>
+#include <stdint.h>
 #include <sstream>
 #if _OPENMP
 #include <omp.h>

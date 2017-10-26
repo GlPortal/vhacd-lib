@@ -27,6 +27,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 #include "vhacdMutex.h"
 #include "vhacdVolume.h"
 #include "vhacdRaycastMesh.h"
+#include <stdint.h>
 #include <vector>
 
 #define USE_THREAD 1

@@ -17,6 +17,7 @@ subject to the following restrictions:
 
 #include "btAlignedObjectArray.h"
 #include "btVector3.h"
+#include <stdint.h>
 
 /// Convex hull implementation based on Preparata and Hong
 /// See http://code.google.com/p/bullet/issues/detail?id=275
