@@ -62,6 +62,7 @@
 #if defined(__linux__)
 //#include <sys/time.h>
 #include <errno.h>
+#include <stdint.h>
 #include <time.h>
 #include <unistd.h>
 #define __stdcall

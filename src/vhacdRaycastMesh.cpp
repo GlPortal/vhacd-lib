@@ -1,6 +1,7 @@
 #include "vhacdRaycastMesh.h"
 #include <math.h>
 #include <assert.h>
+#include <stdint.h>
 
 namespace RAYCAST_MESH
 {

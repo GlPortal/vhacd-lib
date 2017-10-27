@@ -23,6 +23,7 @@
 #include <fstream>
 #include <iosfwd>
 #include <iostream>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>

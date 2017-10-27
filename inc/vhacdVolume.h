@@ -15,9 +15,11 @@
 #pragma once
 #ifndef VHACD_VOLUME_H
 #define VHACD_VOLUME_H
+
 #include "vhacdMesh.h"
 #include "vhacdVector.h"
 #include <assert.h>
+#include <stdint.h>
 
 #ifdef _MSC_VER
 #pragma warning(push)
